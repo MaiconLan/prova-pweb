@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<ui:composition template="template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core">
+
+	<ui:define name="conteudo">
+		<h:form id="formCarro">
+			<p:growl autoUpdate="true" />
+			<p:panel id="panelCarro" header="Cadastrar Carro">
+				<p:panelGrid columns="6">
+					<p:outputLabel value="Id:" for="idCarro" />
+					<p:inputText id="idCarro" required="true"
+						requiredMessage="Campo ID obrigatório"
+						value="#{carroController.carro.idCarro}">
+						<f:validateLongRange minimum="1" />
+					</p:inputText>
+
+					<p:outputLabel value="Marca: " for="marca" />
+					<p:inputText id="marca" value="#{carroController.carro.marca}"
+						required="true" requiredMessage="Campo marca obrigatório" />
+
+					<p:outputLabel for="modelo" value="Modelo" />
+					<p:inputText id="modelo" value="#{carroController.carro.modelo}"
+						required="true" requiredMessage="Campo modelo obrigatório">
+					</p:inputText>
+
+					<p:outputLabel for="placa" value="Placa" />
+					<p:inputMask id="placa" value="#{carroController.carro.placa}"
+						mask="aaa-9999" required="true"
+						requiredMessage="Campo placa obrigatório">
+					</p:inputMask>
+
+					<p:outputLabel for="fabricacao" value="Ano de fabricação" />
+					<p:inputText id="fabricacao" minValue="1970" maxValue="2019"
+						value="#{carroController.carro.fabricacao}" required="true"
+						emptyValue="empty"
+						requiredMessage="Campo ano de fabricação obrigatório">
+						<f:validateLongRange minimum="1970" maximum="2019"
+							for="fabricacao" />
+					</p:inputText>
+
+					<p:outputLabel for="valor" value="Valor" />
+					<p:inputNumber id="valor" value="#{carroController.carro.valor}"
+						symbol="R$" required="true" decimalSeparator="," minValue="0"
+						thousandSeparator="." requiredMessage="Campo valor obrigatório">
+					</p:inputNumber>
+
+					<p:commandButton value="Salvar"
+						styleClass="btn-block btn-success btn-flat"
+						actionListener="#{carroController.salvar}"
+						update="formTableCarro formCarro" />
+				</p:panelGrid>
+			</p:panel>
+		</h:form>
+
+		<f:param id="quantidadeCarros" name="qtd"
+			value="#{carroController.carros.size()}" />
+		<h:form id="formTableCarro">
+			<p:dataTable id="tableCarros" value="#{carroController.carros}"
+				var="carro" emptyMessage="Não foram encontrados registros."
+				reflow="true" paginator="true" rows="10"
+				rowStyleClass="#{carroController.validaAno(carro)}">
+
+				<p:column headerText="Id" sortBy="#{carro.idCarro}" priority="1">
+					<p:outputLabel value="#{carro.idCarro}" />
+				</p:column>
+
+				<p:column headerText="Marca" sortBy="#{carro.marca}" priority="2">
+					<p:outputLabel value="#{carro.marca}" />
+				</p:column>
+
+				<p:column headerText="Modelo" sortBy="#{carro.modelo}" priority="2">
+					<p:outputLabel value="#{carro.modelo}" />
+				</p:column>
+
+				<p:column headerText="Placa" sortBy="#{carro.placa}" priority="4">
+					<p:outputLabel value="#{carro.placa}" />
+				</p:column>
+
+				<p:column headerText="Ano de fabricação"
+					sortBy="#{carro.fabricacao}" priority="2">
+					<p:outputLabel value="#{carro.fabricacao}" />
+				</p:column>
+
+				<p:column headerText="Valor" sortBy="#{carro.valor}" priority="3">
+					<p:outputLabel value="#{carro.valor}">
+						<f:convertNumber currencySymbol="R$" type="currency" />
+					</p:outputLabel>
+				</p:column>
+
+				<p:column headerText="Ações" exportable="false" priority="1">
+					<p:commandButton icon="ui-icon-pencil"
+						actionListener="#{carroController.editar}" update="formCarro">
+						<f:attribute name="carroSelecionado" value="#{carro}" />
+					</p:commandButton>
+
+					<p:commandButton icon="ui-icon-trash"
+						actionListener="#{carroController.excluir}"
+						update="formCarro formTableCarro">
+
+						<p:confirm header="Confirmação" message="Excluir Carro?"
+							icon="ui-icon-alert" />
+						<f:attribute name="carroExcluido" value="#{carro}" />
+					</p:commandButton>
+
+				</p:column>
+
+				<f:facet name="footer">
+					<p:outputLabel value="Valor total " />
+					<p:outputLabel value="#{carroController.valorTotalCarros}">
+						<f:convertNumber currencySymbol="R$" type="currency" />
+					</p:outputLabel>
+				</f:facet>
+			</p:dataTable>
+		</h:form>
+
+		<h:form id="modalExcluir">
+			<p:confirmDialog global="true" showEffect="fade" hideEffect="fade"
+				severity="alert">
+				<p:commandButton value="Sim" type="button"
+					styleClass="ui-confirmdialog-yes btn-block btn-success btn-flat" icon="ui-icon-check" />
+				<p:commandButton value="Não" type="button"
+					styleClass="ui-confirmdialog-no btn-block btn-warning btn-flat" icon="ui-icon-close" />
+			</p:confirmDialog>
+		</h:form>
+	</ui:define>
+</ui:composition>
